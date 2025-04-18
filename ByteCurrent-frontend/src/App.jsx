@@ -4,7 +4,6 @@ import {Routes ,Route} from 'react-router'
 import './App.css'
 
 import Homepage from './pages/Homepage'
-import AlgalBloom from './pages/AlgalBloom'
 import HeatmapAndStat from './pages/HeatmapAndStat'
 import TempAnalysis from './pages/TempAnalysis'
 import AlgaeMap from './pages/AlgaeMap'
