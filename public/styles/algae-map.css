@@ -1,0 +1,108 @@
+/* Algae Map specific styles */
+.algae-map-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .map-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .time-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .time-controls select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  .play-button {
+    padding: 8px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .play-button.active {
+    background-color: #e74c3c;
+  }
+  
+  .play-button:hover {
+    opacity: 0.9;
+  }
+  
+  .current-date {
+    font-weight: bold;
+    margin-left: 10px;
+  }
+  
+  .map-content {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .map-view {
+    flex: 2;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .location-details {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-container {
+    margin: 20px 0;
+    height: 300px;
+  }
+  
+  .status-info {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+  
+  .status-low {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .status-moderate {
+    color: orange;
+    font-weight: bold;
+  }
+  
+  .status-high {
+    color: red;
+    font-weight: bold;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .map-content {
+      flex-direction: column;
+    }
+    
+    .map-controls {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }

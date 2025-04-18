@@ -7,6 +7,7 @@ import Homepage from './pages/Homepage'
 import AlgalBloom from './pages/AlgalBloom'
 import HeatmapAndStat from './pages/HeatmapAndStat'
 import TempAnalysis from './pages/TempAnalysis'
+import AlgaeMap from './pages/AlgaeMap'
 
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
     <>
       <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/algal-bloom-detec" element={<AlgalBloom />} />
+          <Route path="/algal-bloom-detec" element={<AlgaeMap />} />
           <Route path="/heatmaps-and-stats" element={<HeatmapAndStat />} />
           <Route path="/temp-analysis" element={<TempAnalysis />} />
       </Routes>
