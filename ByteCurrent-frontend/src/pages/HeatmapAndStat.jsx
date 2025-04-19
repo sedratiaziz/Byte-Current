@@ -176,7 +176,7 @@ const HeatmapAndStat = () => {
     setIsLoading(true);
     try {
       setTimeout(() => {
-        setAlgaeImage('https://via.placeholder.com/500?text=Algae+Detection+Result');
+        setAlgaeImage('../');
         setIsLoading(false);
       }, 1500);
     } catch (error) {

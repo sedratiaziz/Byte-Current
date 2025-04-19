@@ -16,7 +16,7 @@ CORS(app)  # Enable CORS for all routes
 
 # Load ML model (replace with your actual model path)
 try:
-    model = joblib.load('algae_classifier.pkl')
+    model = joblib.load('./algae-classifier.pkl')
 except:
     # Fallback to a simple model if the file doesn't exist
     from sklearn.ensemble import RandomForestClassifier

@@ -1,7 +1,8 @@
 import { Box, Container, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router'
-import bgVideo from '/ByteCurrent-forntend/src/pages/unwrap_v43_2023-10-26_1332.mp4' // ✅ Update the path!
+// import bgVideo from '/ByteCurrent-forntend/src/pages/unwrap_v43_2023-10-26_1332.mp4' // ✅ Update the path!
+import bgVideo from '../unwrap_v43_2023-10-26_1332.mp4'
 
 function Homepage() {
   return (
