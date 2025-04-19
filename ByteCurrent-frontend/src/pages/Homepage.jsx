@@ -1,9 +1,8 @@
-import { Box, Container, Typography } from '@mui/material'
-import React from 'react'
-import { Link } from 'react-router'
-// import bgVideo from '/ByteCurrent-forntend/src/pages/unwrap_v43_2023-10-26_1332.mp4' // ✅ Update the path!
-import bgVideo from '../unwrap_v43_2023-10-26_1332.mp4'
-
+import React from 'react';
+import { Box, Container, Typography } from '@mui/material';
+import { Link } from 'react-router';
+import './Buttons.css'; 
+import bgVideo from '/ByteCurrent-frontend/src/pages/unwrap_v43_2023-10-26_1332.mp4'; 
 function Homepage() {
   return (
     <Box sx={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
@@ -35,49 +34,70 @@ function Homepage() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-evenly',
-            color: '#fff', // Makes text visible over video
-            textShadow: '0 0 10px rgba(0,0,0,0.7)', // Adds contrast
+            alignItems: 'center',
+            color: '#fff',
+            textAlign: 'center',
+            textShadow: '0 0 10px rgba(0,0,0,0.7)',
           }}
         >
-          <Box
-            sx={{
-              height: '50%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-evenly',
-              p: 2,
-            }}
-          >
-            <Typography variant='h1'>Algaerithm</Typography>
-            <Typography variant='body1' sx={{ paddingRight: 15, paddingLeft: 15 }}>
-              At Algaerithm, we harness the power of OpenCosmos' satellite data to detect algal blooms and track ocean health in real time. 
-              By combining the tech, environmental insights, and our teams skills, we turn complex data into clear, actionable results, protecting our planet’s precious waters.
+          {/* 🧠 Intro */}
+          <Box sx={{ maxWidth: '800px', px: 2 }}>
+            <Typography variant="h1" sx={{ fontWeight: 'bold' }}>Algaerithm</Typography>
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              At Algaerithm, we harness the power of OpenCosmos' satellite data to detect algal blooms and track ocean health in real time.
+              By combining technology, environmental insights, and our team's skills, we turn complex data into clear, actionable results—
+              protecting our planet’s precious waters.
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              height: '50%',
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-              p: 2,
-            }}
-          >
-            <Link to={'/algal-bloom-detec'}>
-              <Box sx={{ p: 2, border: '1px solid white', borderRadius: 2 }}><Typography>Algal Bloom Detection</Typography></Box>
+          {/* 🚀 Navigation Buttons */}
+          <Box sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 3,
+            mt: 4,
+          }}>
+            <Link to="/algal-bloom-detec">
+              <button className="button">
+                <span className="sparkle">
+                  <svg className="icon" viewBox="0 0 24 24" fill="none">
+                    <path className="path" d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" />
+                  </svg>
+                </span>
+                <span className="text_button">Algal Bloom Detection</span>
+                <span className="dots_border"></span>
+              </button>
             </Link>
-            <Link to={'/heatmaps-and-stats'}>
-              <Box sx={{ p: 2, border: '1px solid white', borderRadius: 2 }}><Typography>Heatmaps and Statistic</Typography></Box>
+
+            <Link to="/heatmaps-and-stats">
+              <button className="button">
+                <span className="sparkle">
+                  <svg className="icon" viewBox="0 0 24 24" fill="none">
+                    <path className="path" d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" />
+                  </svg>
+                </span>
+                <span className="text_button">Heatmaps & Statistics</span>
+                <span className="dots_border"></span>
+              </button>
             </Link>
-            <Link to={'/temp-analysis'}>
-              <Box sx={{ p: 2, border: '1px solid white', borderRadius: 2 }}><Typography>Surface Temperature Analysis</Typography></Box>
+
+            <Link to="/temp-analysis">
+              <button className="button">
+                <span className="sparkle">
+                  <svg className="icon" viewBox="0 0 24 24" fill="none">
+                    <path className="path" d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" />
+                  </svg>
+                </span>
+                <span className="text_button">Surface Temp Analysis</span>
+                <span className="dots_border"></span>
+              </button>
             </Link>
           </Box>
         </Box>
       </Container>
     </Box>
-  )
+  );
 }
 
-export default Homepage
+export default Homepage;
