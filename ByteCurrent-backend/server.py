@@ -8,9 +8,45 @@ import matplotlib.pyplot as plt
 import base64
 import os
 import tempfile
+import joblib  # For loading the ML model
+from sklearn.ensemble import RandomForestClassifier  # Example classifier
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+
+# Load ML model (replace with your actual model path)
+try:
+    model = joblib.load('algae_classifier.pkl')
+except:
+    # Fallback to a simple model if the file doesn't exist
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier()
+    # Dummy training just to have a working model
+    model.fit([[0,0,0], [255,255,255]], [0,1])
+
+def ml_algae_detection(rgb_water):
+    """
+    Predict algae presence using ML model
+    Args:
+        rgb_water: numpy array of shape (H,W,3) with water pixels only (others should be nan)
+    Returns:
+        Binary mask where 1=algae, 0=water
+    """
+    # Prepare data for prediction
+    valid_pixels = ~np.isnan(rgb_water[:,:,0])
+    X = rgb_water[valid_pixels]
+    
+    if len(X) == 0:
+        return np.zeros_like(rgb_water[:,:,0], dtype=bool)
+    
+    # Predict
+    predictions = model.predict(X)
+    
+    # Reconstruct mask
+    algae_mask = np.zeros_like(rgb_water[:,:,0], dtype=bool)
+    algae_mask[valid_pixels] = predictions == 1
+    
+    return algae_mask
 
 # Serve static files (for production)
 @app.route('/static/<path:path>')
@@ -42,7 +78,8 @@ def detect_algae():
             # Extract bands (simplified version)
             blue = img_array[:,:,2].astype(float)
             green = img_array[:,:,1].astype(float)
-            nir = img_array[:,:,0].astype(float) * 0.8  # Mock NIR
+            red = img_array[:,:,0].astype(float)
+            nir = red * 0.8  # Mock NIR
             
             # Calculate NDWI (water index)
             ndwi = es.normalized_diff(green, nir)
@@ -51,9 +88,13 @@ def detect_algae():
             water_mask = ndwi > 0
             blue_water = np.where(water_mask, blue, np.nan)
             green_water = np.where(water_mask, green, np.nan)
+            red_water = np.where(water_mask, red, np.nan)
             
-            # Algae detection
-            algae_mask = (blue_water > 100) & (green_water > 100)
+            # Stack RGB water pixels for ML model
+            rgb_water = np.stack([red_water, green_water, blue_water], axis=-1)
+            
+            # ML-based algae detection (replaces threshold approach)
+            algae_mask = ml_algae_detection(rgb_water)
             
             # Create visualization
             plt.figure(figsize=(10, 10))

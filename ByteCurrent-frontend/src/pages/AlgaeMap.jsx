@@ -101,62 +101,67 @@ const AlgaeMap = () => {
   };
 
   // Process image through algae detection API
-  const detectAlgaeInImage = async (lakeName) => {
-    setIsLoading(true);
-    try {
-      // In a real implementation, fetch satellite image for the location
-      // For demo, we'll use a sample image
-      const response = await fetch('sample-lake-image.jpg');
-      const imageBlob = await response.blob();
-      
-      // Create FormData to send to backend
-      const formData = new FormData();
-      formData.append('image', imageBlob, `${lakeName}.jpg`);
-      
-      // Call your Flask backend
-      const apiResponse = await fetch('http://localhost:5000/api/detect-algae', {
-        method: 'POST',
-        body: formData,
-        // Don't set Content-Type header - let the browser set it
-      });
-      
-      if (!apiResponse.ok) {
-        throw new Error('Algae detection failed');
-      }
-      
-      const result = await apiResponse.json();
-      
-      // Update state with results
-      setAlgaeImage(`data:image/png;base64,${result.algae_mask}`);
-      
-      // Update location data with new coverage info
-      setLocations(prev => ({
-        ...prev,
-        [lakeName]: {
-          ...prev[lakeName],
-          currentLevel: result.status,
-          coverage: result.coverage,
-        }
-      }));
-      
-      // Also update selected location if it's the current one
-      if (selectedLocation && selectedLocation.name === lakeName) {
-        setSelectedLocation(prev => ({
-          ...prev,
-          currentLevel: result.status,
-          coverage: result.coverage,
-        }));
-      }
-      
-    } catch (error) {
-      console.error('Error detecting algae:', error);
-      // Fallback to mock data if API fails
-      const mockAlgaeImage = `data:image/png;base64,...`; 
-      setAlgaeImage(mockAlgaeImage);
-    } finally {
-      setIsLoading(false);
+  // Process image through algae detection API
+const detectAlgaeInImage = async (lakeName) => {
+  setIsLoading(true);
+  setAlgaeImage(null); // Reset previous image
+  
+  try {
+    // In a real app, you would fetch the satellite image for the selected location
+    // For demo purposes, we'll use a sample image
+    const response = await fetch('sample-lake-image.jpg');
+    const imageBlob = await response.blob();
+    
+    // Create FormData to send to backend
+    const formData = new FormData();
+    formData.append('image', imageBlob, `${lakeName}.jpg`);
+    
+    // Call your Flask backend
+    const apiResponse = await fetch('http://localhost:5000/api/detect-algae', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!apiResponse.ok) {
+      throw new Error(`Server responded with ${apiResponse.status}`);
     }
-  };
+    
+    const result = await apiResponse.json();
+    
+    // Update state with results
+    if (result.algae_mask) {
+      setAlgaeImage(`data:image/png;base64,${result.algae_mask}`);
+    } else {
+      throw new Error('No algae mask returned from server');
+    }
+    
+    // Update location data with new coverage info
+    setLocations(prev => ({
+      ...prev,
+      [lakeName]: {
+        ...prev[lakeName],
+        currentLevel: result.status || 'Unknown',
+        coverage: result.coverage || '0%',
+      }
+    }));
+    
+    // Update selected location if it's the current one
+    if (selectedLocation && selectedLocation.name === lakeName) {
+      setSelectedLocation(prev => ({
+        ...prev,
+        currentLevel: result.status || 'Unknown',
+        coverage: result.coverage || '0%',
+      }));
+    }
+    
+  } catch (error) {
+    console.error('Error detecting algae:', error);
+    // Fallback to a placeholder image
+    setAlgaeImage('https://via.placeholder.com/500x300?text=Error+processing+image');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Filter data based on selected time range
   const getFilteredData = () => {

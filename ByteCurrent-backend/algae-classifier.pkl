@@ -1,0 +1,8 @@
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+
+# X_train = array of RGB pixel values
+# y_train = array of labels (0=water, 1=algae)
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+joblib.dump(model, 'algae_classifier.pkl')
