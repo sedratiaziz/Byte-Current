@@ -144,6 +144,35 @@ const HeatmapAndStat = () => {
   const [algaeImage, setAlgaeImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [allHeatPoints, setAllHeatPoints] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const mapRef = useRef(null);
+
+  // Handle search input
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (value.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    
+    // Filter lake names based on search term
+    const filteredLakes = Object.keys(locations).filter(lake => 
+      lake.toLowerCase().includes(value.toLowerCase())
+    );
+    
+    setSearchResults(filteredLakes);
+  };
+
+  // Select lake from search results
+  const selectLakeFromSearch = (lakeName) => {
+    handleLocationSelect(lakeName);
+    setSearchTerm('');
+    setSearchResults([]);
+  };
+  
 
   // Combine all heat points for the heatmap layer
   useEffect(() => {
@@ -155,66 +184,64 @@ const HeatmapAndStat = () => {
   }, [locations]);
 
   // Fetch real data for a location
-  // Fetch real data for a location
-const fetchLakeData = async (lakeName) => {
-  setIsLoading(true);
-  try {
-    // Use the existing coverage from LAKE_DATA instead of randomizing
-    const currentCoverage = locations[lakeName].coverage;
-    const currentLevel = locations[lakeName].currentLevel;
-    
-    const mockResponse = {
-      currentLevel: currentLevel,
-      coverage: currentCoverage,
-      historical: Array(30).fill().map((_, i) => ({
-        date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-        level: parseFloat(currentCoverage), // Use the coverage value for consistency
-        status: currentLevel
-      }))
-    };
-    
-    setLocations(prev => ({
-      ...prev,
-      [lakeName]: {
-        ...prev[lakeName],
-        currentLevel: mockResponse.currentLevel,
-        coverage: mockResponse.coverage,
-        levels: mockResponse.historical,
-        heatPoints: generateHeatPoints(prev[lakeName].position, mockResponse.currentLevel)
-      }
-    }));
-    
-    return mockResponse;
-  } catch (error) {
-    console.error('Error fetching lake data:', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  const fetchLakeData = async (lakeName) => {
+    setIsLoading(true);
+    try {
+      // Use the existing coverage from LAKE_DATA instead of randomizing
+      const currentCoverage = locations[lakeName].coverage;
+      const currentLevel = locations[lakeName].currentLevel;
+      
+      const mockResponse = {
+        currentLevel: currentLevel,
+        coverage: currentCoverage,
+        historical: Array(30).fill().map((_, i) => ({
+          date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+          level: parseFloat(currentCoverage), // Use the coverage value for consistency
+          status: currentLevel
+        }))
+      };
+      
+      setLocations(prev => ({
+        ...prev,
+        [lakeName]: {
+          ...prev[lakeName],
+          currentLevel: mockResponse.currentLevel,
+          coverage: mockResponse.coverage,
+          levels: mockResponse.historical,
+          heatPoints: generateHeatPoints(prev[lakeName].position, mockResponse.currentLevel)
+        }
+      }));
+      
+      return mockResponse;
+    } catch (error) {
+      console.error('Error fetching lake data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Handle location selection
+  // const handleLocationSelect = (lakeName) => {
+  //   const locationData = locations[lakeName];
+  //   setSelectedLocation({ name: lakeName, ...locationData });
+    
+  //   if (locationData.levels.length === 0) {
+  //     fetchLakeData(lakeName);
+  //   }
+  // };
   const handleLocationSelect = (lakeName) => {
     const locationData = locations[lakeName];
     setSelectedLocation({ name: lakeName, ...locationData });
-    
+  
+    if (mapRef.current && locationData) {
+      mapRef.current.setView(locationData.position, 7);
+    }
+  
     if (locationData.levels.length === 0) {
       fetchLakeData(lakeName);
     }
   };
-
-  // Process image through algae detection API
-  // const detectAlgaeInImage = async (imageUrl) => {
-  //   setIsLoading(true);
-  //   try {
-  //     setTimeout(() => {
-  //       setAlgaeImage('./sample-lake-img.jpg');
-  //       setIsLoading(false);
-  //     }, 1500);
-  //   } catch (error) {
-  //     console.error('Error detecting algae:', error);
-  //     setIsLoading(false);
-  //   }
-  // };
+  
 
   // Filter data based on selected time range
   const getFilteredData = () => {
@@ -244,11 +271,43 @@ const fetchLakeData = async (lakeName) => {
       },
     ],
   };
+  
+  // Map reference handler
+  const MapReference = () => {
+    const map = useMap();
+    mapRef.current = map;
+    return null;
+  };
 
   return (
     <div className="algae-map-container">
       <div className="map-controls">
         <h2>Algae Bloom Monitoring (Heatmap)</h2>
+        
+        {/* Search Bar Component */}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search for a lake..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          {searchResults.length > 0 && (
+            <ul className="search-results">
+              {searchResults.map(lake => (
+                <li 
+                  key={lake} 
+                  onClick={() => selectLakeFromSearch(lake)}
+                  className="search-result-item"
+                >
+                  {lake}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        
         {/* <div className="time-controls">
           <select 
             value={timeRange} 
@@ -283,12 +342,34 @@ const fetchLakeData = async (lakeName) => {
             zoom={4} 
             style={{ height: '500px', width: '100%' }}
           >
+            <MapReference />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             
             <HeatmapLayer points={allHeatPoints} />
+            {Object.entries(locations).map(([name, data]) => (
+  <React.Fragment key={name}>
+    {data.heatPoints.slice(0, 1).map((point, index) => (
+      <Popup
+        key={`${name}-${index}`}
+        position={[point[0], point[1]]}
+        eventHandlers={{
+          click: () => handleLocationSelect(name),
+        }}
+      >
+        <div>
+          <h3>{name}</h3>
+          <p>Status: <strong>{data.currentLevel}</strong></p>
+          <p>Coverage: <strong>{data.coverage || 'N/A'}</strong></p>
+          <button onClick={() => handleLocationSelect(name)}>View Details</button>
+        </div>
+      </Popup>
+    ))}
+  </React.Fragment>
+))}
+
             
             {/* Transparent click targets for interaction */}
             {Object.entries(locations).map(([name, data]) => (
@@ -335,26 +416,6 @@ const fetchLakeData = async (lakeName) => {
                 <p>Loading historical data...</p>
               )}
             </div>
-            
-            {/* Removed since ML is not working currently, also due to time */}
-            {/* <div className="algae-detection-section">
-              <h4>Latest Algae Detection</h4>
-              {algaeImage ? (
-                <img 
-                  src={algaeImage} 
-                  alt="Algae detection result" 
-                  style={{ width: '100%', border: '1px solid #ddd' }}
-                />
-              ) : (
-                <button 
-                  onClick={() => detectAlgaeInImage(selectedLocation.name)}
-                  disabled={isLoading}
-                  className="detect-button"
-                >
-                  {isLoading ? 'Processing...' : 'Run Algae Detection'}
-                </button>
-              )}
-            </div> */}
             
             <div className="status-info">
               <h4>Heatmap Legend:</h4>
