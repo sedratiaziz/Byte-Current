@@ -25,17 +25,26 @@ const LAKE_DATA = {
   'Lake Tahoe': {
     position: [39.0968, -120.0324],
     apiEndpoint: '/api/tahoe',
-    historicalData: []
+    historicalData: [],
+    levels: [],  // Add this line
+    currentLevel: 'Low',  // Default value
+    coverage: '0%'  // Default value
   },
   'Lake Erie': {
     position: [41.681, -81.7356],
     apiEndpoint: '/api/erie',
-    historicalData: []
+    historicalData: [],
+    levels: [],  // Add this line
+    currentLevel: 'Moderate',  // Default value
+    coverage: '0%'  // Default value
   },
   'Lake Okeechobee': {
     position: [26.9342, -80.8292],
     apiEndpoint: '/api/okeechobee',
-    historicalData: []
+    historicalData: [],
+    levels: [],  // Add this line
+    currentLevel: 'High',  // Default value
+    coverage: '0%'  // Default value
   }
 };
 
@@ -52,34 +61,29 @@ const AlgaeMap = () => {
   const fetchLakeData = async (lakeName) => {
     setIsLoading(true);
     try {
-      // In a real app, this would call your backend API
-      // const response = await fetch(locations[lakeName].apiEndpoint);
-      // const data = await response.json();
-      
-      // Mock API response
+      // Mock API response with proper structure
       const mockResponse = {
         currentLevel: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)],
         coverage: `${(Math.random() * 100).toFixed(2)}%`,
-        historical: Array(30).fill().map((_, i) => ({
+        levels: Array(30).fill().map((_, i) => ({  // Ensure 'levels' exists
           date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
           level: Math.floor(Math.random() * 100),
           status: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)]
         }))
       };
-      
+  
       setLocations(prev => ({
         ...prev,
         [lakeName]: {
           ...prev[lakeName],
-          currentLevel: mockResponse.currentLevel,
-          coverage: mockResponse.coverage,
-          levels: mockResponse.historical
+          ...mockResponse  // Spread the entire response
         }
       }));
       
       return mockResponse;
     } catch (error) {
       console.error('Error fetching lake data:', error);
+      return { levels: [] };  // Return empty levels on error
     } finally {
       setIsLoading(false);
     }

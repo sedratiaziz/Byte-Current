@@ -83,19 +83,25 @@ const LAKE_DATA = {
     position: [39.0968, -120.0324],
     apiEndpoint: '/api/tahoe',
     historicalData: [],
-    heatPoints: generateHeatPoints([39.0968, -120.0324], 'Moderate')
+    levels: [],  // Add this line
+    currentLevel: 'Low',  // Default value
+    coverage: '0%'  // Default value
   },
   'Lake Erie': {
     position: [41.681, -81.7356],
     apiEndpoint: '/api/erie',
     historicalData: [],
-    heatPoints: generateHeatPoints([41.681, -81.7356], 'High')
+    levels: [],  // Add this line
+    currentLevel: 'Moderate',  // Default value
+    coverage: '0%'  // Default value
   },
   'Lake Okeechobee': {
     position: [26.9342, -80.8292],
     apiEndpoint: '/api/okeechobee',
     historicalData: [],
-    heatPoints: generateHeatPoints([26.9342, -80.8292], 'Low')
+    levels: [],  // Add this line
+    currentLevel: 'High',  // Default value
+    coverage: '0%'  // Default value
   }
 };
 
