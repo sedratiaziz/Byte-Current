@@ -21,30 +21,54 @@ L.Icon.Default.mergeOptions({
 Chart.register(...registerables);
 
 // Real lake data with API endpoints
-const LAKE_DATA = {
-  'Lake Tahoe': {
-    position: [39.0968, -120.0324],
-    apiEndpoint: '/api/tahoe',
-    historicalData: [],
-    levels: [],  // Add this line
-    currentLevel: 'Low',  // Default value
-    coverage: '9.02%'  // Default value
+const LAKE_DATA = { 
+  'Lake Tahoe': { 
+    position: [39.0968, -120.0324], 
+    apiEndpoint: '/api/tahoe', 
+    historicalData: [], 
+    levels: [], 
+    currentLevel: 'Low', 
+    coverage: '9.02%' 
+  }, 
+  'Lake Erie': { 
+    position: [41.681, -81.7356], 
+    apiEndpoint: '/api/erie', 
+    historicalData: [], 
+    levels: [], 
+    currentLevel: 'Moderate', 
+    coverage: '17.46%' 
+  }, 
+  'Lake Okeechobee': { 
+    position: [26.9342, -80.8292], 
+    apiEndpoint: '/api/okeechobee', 
+    historicalData: [], 
+    levels: [], 
+    currentLevel: 'High', 
+    coverage: '44.97%' 
   },
-  'Lake Erie': {
-    position: [41.681, -81.7356],
-    apiEndpoint: '/api/erie',
+  'Lake Baikal': {
+    position: [53.5000, 108.2000],
+    apiEndpoint: '/api/baikal',
     historicalData: [],
-    levels: [],  // Add this line
-    currentLevel: 'Moderate',  // Default value
-    coverage: '17.46%'  // Default value
+    levels: [],
+    currentLevel: 'High',
+    coverage: '31.25%'
   },
-  'Lake Okeechobee': {
-    position: [26.9342, -80.8292],
-    apiEndpoint: '/api/okeechobee',
+  'Lake Victoria': {
+    position: [-0.7500, 33.4500],
+    apiEndpoint: '/api/victoria',
     historicalData: [],
-    levels: [],  // Add this line
-    currentLevel: 'High',  // Default value
-    coverage: '44.97%'  // Default value
+    levels: [],
+    currentLevel: 'Moderate',
+    coverage: '22.83%'
+  },
+  'Lake Geneva': {
+    position: [46.4500, 6.5300],
+    apiEndpoint: '/api/geneva',
+    historicalData: [],
+    levels: [],
+    currentLevel: 'Low',
+    coverage: '12.76%'
   }
 };
 
@@ -56,6 +80,33 @@ const AlgaeMap = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [algaeImage, setAlgaeImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  // Handle search input
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (value.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    
+    // Filter lake names based on search term
+    const filteredLakes = Object.keys(locations).filter(lake => 
+      lake.toLowerCase().includes(value.toLowerCase())
+    );
+    
+    setSearchResults(filteredLakes);
+  };
+
+  // Select lake from search results
+  const selectLakeFromSearch = (lakeName) => {
+    handleLocationSelect(lakeName);
+    setSearchTerm('');
+    setSearchResults([]);
+  };
 
   // Fetch real data for a location
   const fetchLakeData = async (lakeName) => {
@@ -111,67 +162,66 @@ const AlgaeMap = () => {
   };
 
   // Process image through algae detection API
-  // Process image through algae detection API
-const detectAlgaeInImage = async (lakeName) => {
-  setIsLoading(true);
-  setAlgaeImage(null); // Reset previous image
-  
-  try {
-    // In a real app, you would fetch the satellite image for the selected location
-    // For demo purposes, we'll use a sample image
-    const response = await fetch('sample-lake-image.jpg');
-    const imageBlob = await response.blob();
+  const detectAlgaeInImage = async (lakeName) => {
+    setIsLoading(true);
+    setAlgaeImage(null); // Reset previous image
     
-    // Create FormData to send to backend
-    const formData = new FormData();
-    formData.append('image', imageBlob, `${lakeName}.jpg`);
-    
-    // Call your Flask backend
-    const apiResponse = await fetch('http://localhost:5000/api/detect-algae', {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!apiResponse.ok) {
-      throw new Error(`Server responded with ${apiResponse.status}`);
-    }
-    
-    const result = await apiResponse.json();
-    
-    // Update state with results
-    if (result.algae_mask) {
-      setAlgaeImage(`data:image/png;base64,${result.algae_mask}`);
-    } else {
-      throw new Error('No algae mask returned from server');
-    }
-    
-    // Update location data with new coverage info
-    setLocations(prev => ({
-      ...prev,
-      [lakeName]: {
-        ...prev[lakeName],
-        currentLevel: result.status || 'Unknown',
-        coverage: result.coverage || '0%',
+    try {
+      // In a real app, you would fetch the satellite image for the selected location
+      // For demo purposes, we'll use a sample image
+      const response = await fetch('sample-lake-image.jpg');
+      const imageBlob = await response.blob();
+      
+      // Create FormData to send to backend
+      const formData = new FormData();
+      formData.append('image', imageBlob, `${lakeName}.jpg`);
+      
+      // Call your Flask backend
+      const apiResponse = await fetch('http://localhost:5000/api/detect-algae', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!apiResponse.ok) {
+        throw new Error(`Server responded with ${apiResponse.status}`);
       }
-    }));
-    
-    // Update selected location if it's the current one
-    if (selectedLocation && selectedLocation.name === lakeName) {
-      setSelectedLocation(prev => ({
+      
+      const result = await apiResponse.json();
+      
+      // Update state with results
+      if (result.algae_mask) {
+        setAlgaeImage(`data:image/png;base64,${result.algae_mask}`);
+      } else {
+        throw new Error('No algae mask returned from server');
+      }
+      
+      // Update location data with new coverage info
+      setLocations(prev => ({
         ...prev,
-        currentLevel: result.status || 'Unknown',
-        coverage: result.coverage || '0%',
+        [lakeName]: {
+          ...prev[lakeName],
+          currentLevel: result.status || 'Unknown',
+          coverage: result.coverage || '0%',
+        }
       }));
+      
+      // Update selected location if it's the current one
+      if (selectedLocation && selectedLocation.name === lakeName) {
+        setSelectedLocation(prev => ({
+          ...prev,
+          currentLevel: result.status || 'Unknown',
+          coverage: result.coverage || '0%',
+        }));
+      }
+      
+    } catch (error) {
+      console.error('Error detecting algae:', error);
+      // Fallback to a placeholder image
+      setAlgaeImage('https://via.placeholder.com/500x300?text=Error+processing+image');
+    } finally {
+      setIsLoading(false);
     }
-    
-  } catch (error) {
-    console.error('Error detecting algae:', error);
-    // Fallback to a placeholder image
-    setAlgaeImage('https://via.placeholder.com/500x300?text=Error+processing+image');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   // Filter data based on selected time range
   const getFilteredData = () => {
@@ -203,16 +253,35 @@ const detectAlgaeInImage = async (lakeName) => {
     ],
   };
 
-
-
-
-
-  // Add this function to your component
-
   return (
     <div className="algae-map-container">
       <div className="map-controls">
         <h2>Algae Bloom Monitoring</h2>
+        
+        {/* Search Bar Component */}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search for a lake..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          {searchResults.length > 0 && (
+            <ul className="search-results">
+              {searchResults.map(lake => (
+                <li 
+                  key={lake} 
+                  onClick={() => selectLakeFromSearch(lake)}
+                  className="search-result-item"
+                >
+                  {lake}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        
         {/* <div className="time-controls">
           <select 
             value={timeRange} 

@@ -105,6 +105,33 @@ const LAKE_DATA = {
     levels: [],  // Add this line
     currentLevel: 'High',  // Default value
     coverage: '44.97%'  // Default value
+  },
+  'Lake Baikal': {
+    position: [53.5000, 108.2000],
+    apiEndpoint: '/api/baikal',
+    historicalData: [],
+    heatPoints: generateHeatPoints([53.5000, 108.2000], 'High'),
+    levels: [],
+    currentLevel: 'High',
+    coverage: '31.25%'
+  },
+  'Lake Victoria': {
+    position: [-0.7500, 33.4500],
+    apiEndpoint: '/api/victoria',
+    historicalData: [],
+    heatPoints: generateHeatPoints([-0.7500, 33.4500], 'Moderate'),
+    levels: [],
+    currentLevel: 'Moderate',
+    coverage: '22.83%'
+  },
+  'Lake Geneva': {
+    position: [46.4500, 6.5300],
+    apiEndpoint: '/api/geneva',
+    historicalData: [],
+    heatPoints: generateHeatPoints([46.4500, 6.5300], 'Low'),
+    levels: [],
+    currentLevel: 'Low',
+    coverage: '12.76%'
   }
 };
 
