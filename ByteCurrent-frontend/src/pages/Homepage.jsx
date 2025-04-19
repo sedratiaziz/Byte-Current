@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import { Link } from 'react-router';
-import './Buttons.css'; 
+import '../../public/Buttons.css'; 
 import bgVideo from '/ByteCurrent-frontend/src/pages/unwrap_v43_2023-10-26_1332.mp4'; 
 function Homepage() {
   return (
