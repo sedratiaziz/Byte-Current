@@ -1,11 +1,15 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import { Link } from 'react-router';
-import '../../public/Buttons.css'; 
-import bgVideo from '/ByteCurrent-frontend/src/pages/unwrap_v43_2023-10-26_1332.mp4'; 
+import '../../public/Button.css'; 
+import bgVideo from '../unwrap_v43_2023-10-26_1332.mp4'; 
+
 function Homepage() {
   return (
-    <Box sx={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ 
+      height: '100vh', 
+      overflow: 'hidden', 
+      }}>
       {/* 🎥 Background Video */}
       <video
         autoPlay
@@ -42,7 +46,7 @@ function Homepage() {
         >
           {/* 🧠 Intro */}
           <Box sx={{ maxWidth: '800px', px: 2 }}>
-            <Typography variant="h1" sx={{ fontWeight: 'bold' }}>Algaerithm</Typography>
+            <Typography variant="h1" sx={{ fontWeight: 'bold' }}>Algae-rithm</Typography>
             <Typography variant="body1" sx={{ mt: 2 }}>
               At Algaerithm, we harness the power of OpenCosmos' satellite data to detect algal blooms and track ocean health in real time.
               By combining technology, environmental insights, and our team's skills, we turn complex data into clear, actionable results—

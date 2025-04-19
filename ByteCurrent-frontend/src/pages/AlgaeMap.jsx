@@ -28,7 +28,7 @@ const LAKE_DATA = {
     historicalData: [],
     levels: [],  // Add this line
     currentLevel: 'Low',  // Default value
-    coverage: '0%'  // Default value
+    coverage: '9.02%'  // Default value
   },
   'Lake Erie': {
     position: [41.681, -81.7356],
@@ -36,7 +36,7 @@ const LAKE_DATA = {
     historicalData: [],
     levels: [],  // Add this line
     currentLevel: 'Moderate',  // Default value
-    coverage: '0%'  // Default value
+    coverage: '17.46%'  // Default value
   },
   'Lake Okeechobee': {
     position: [26.9342, -80.8292],
@@ -44,7 +44,7 @@ const LAKE_DATA = {
     historicalData: [],
     levels: [],  // Add this line
     currentLevel: 'High',  // Default value
-    coverage: '0%'  // Default value
+    coverage: '44.97%'  // Default value
   }
 };
 
@@ -61,29 +61,39 @@ const AlgaeMap = () => {
   const fetchLakeData = async (lakeName) => {
     setIsLoading(true);
     try {
-      // Mock API response with proper structure
-      const mockResponse = {
-        currentLevel: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)],
-        coverage: `${(Math.random() * 100).toFixed(2)}%`,
-        levels: Array(30).fill().map((_, i) => ({  // Ensure 'levels' exists
+      // Get the predefined values from LAKE_DATA
+      const lake = locations[lakeName];
+      
+      // Create consistent historical data based on the lake's coverage
+      const baseCoverage = parseFloat(lake.coverage);
+      const historicalLevels = Array(30).fill().map((_, i) => {
+        // Create small variations around the base coverage for the timeline
+        const variation = baseCoverage * (0.95 + Math.random() * 0.1); // ±5% variation
+        return {
           date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-          level: Math.floor(Math.random() * 100),
-          status: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)]
-        }))
+          level: Math.min(100, Math.max(0, variation)), // Ensure within 0-100 range
+          status: lake.currentLevel // Use the predefined status
+        };
+      });
+  
+      const mockResponse = {
+        currentLevel: lake.currentLevel, // Use predefined level
+        coverage: lake.coverage, // Use predefined coverage
+        levels: historicalLevels
       };
   
       setLocations(prev => ({
         ...prev,
         [lakeName]: {
           ...prev[lakeName],
-          ...mockResponse  // Spread the entire response
+          ...mockResponse
         }
       }));
       
       return mockResponse;
     } catch (error) {
       console.error('Error fetching lake data:', error);
-      return { levels: [] };  // Return empty levels on error
+      return { levels: [] };
     } finally {
       setIsLoading(false);
     }

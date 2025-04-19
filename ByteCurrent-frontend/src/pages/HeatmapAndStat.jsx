@@ -86,7 +86,7 @@ const LAKE_DATA = {
     heatPoints: generateHeatPoints([39.0968, -120.0324], 'Moderate'),
     levels: [],  // Add this line
     currentLevel: 'Low',  // Default value
-    coverage: '0%'  // Default value
+    coverage: '9.02%'  // Default value
   },
   'Lake Erie': {
     position: [41.681, -81.7356],
@@ -94,8 +94,8 @@ const LAKE_DATA = {
     historicalData: [],
     heatPoints: generateHeatPoints([41.681, -81.7356], 'High'),
     levels: [],  // Add this line
-    currentLevel: 'Low',  // Default value
-    coverage: '0%'  // Default value
+    currentLevel: 'Moderate',  // Default value
+    coverage: '17.46%'  // Default value
   },
   'Lake Okeechobee': {
     position: [26.9342, -80.8292],
@@ -103,8 +103,8 @@ const LAKE_DATA = {
     historicalData: [],
     heatPoints: generateHeatPoints([26.9342, -80.8292], 'Low'),
     levels: [],  // Add this line
-    currentLevel: 'Low',  // Default value
-    coverage: '0%'  // Default value
+    currentLevel: 'High',  // Default value
+    coverage: '44.97%'  // Default value
   }
 };
 
@@ -128,38 +128,42 @@ const HeatmapAndStat = () => {
   }, [locations]);
 
   // Fetch real data for a location
-  const fetchLakeData = async (lakeName) => {
-    setIsLoading(true);
-    try {
-      // Mock API response
-      const mockResponse = {
-        currentLevel: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)],
-        coverage: `${(Math.random() * 100).toFixed(2)}%`,
-        historical: Array(30).fill().map((_, i) => ({
-          date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-          level: Math.floor(Math.random() * 100),
-          status: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)]
-        }))
-      };
-      
-      setLocations(prev => ({
-        ...prev,
-        [lakeName]: {
-          ...prev[lakeName],
-          currentLevel: mockResponse.currentLevel,
-          coverage: mockResponse.coverage,
-          levels: mockResponse.historical,
-          heatPoints: generateHeatPoints(prev[lakeName].position, mockResponse.currentLevel)
-        }
-      }));
-      
-      return mockResponse;
-    } catch (error) {
-      console.error('Error fetching lake data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Fetch real data for a location
+const fetchLakeData = async (lakeName) => {
+  setIsLoading(true);
+  try {
+    // Use the existing coverage from LAKE_DATA instead of randomizing
+    const currentCoverage = locations[lakeName].coverage;
+    const currentLevel = locations[lakeName].currentLevel;
+    
+    const mockResponse = {
+      currentLevel: currentLevel,
+      coverage: currentCoverage,
+      historical: Array(30).fill().map((_, i) => ({
+        date: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        level: parseFloat(currentCoverage), // Use the coverage value for consistency
+        status: currentLevel
+      }))
+    };
+    
+    setLocations(prev => ({
+      ...prev,
+      [lakeName]: {
+        ...prev[lakeName],
+        currentLevel: mockResponse.currentLevel,
+        coverage: mockResponse.coverage,
+        levels: mockResponse.historical,
+        heatPoints: generateHeatPoints(prev[lakeName].position, mockResponse.currentLevel)
+      }
+    }));
+    
+    return mockResponse;
+  } catch (error) {
+    console.error('Error fetching lake data:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Handle location selection
   const handleLocationSelect = (lakeName) => {
