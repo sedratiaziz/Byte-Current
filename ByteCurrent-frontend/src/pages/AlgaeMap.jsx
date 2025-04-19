@@ -203,7 +203,7 @@ const detectAlgaeInImage = async (lakeName) => {
     <div className="algae-map-container">
       <div className="map-controls">
         <h2>Algae Bloom Monitoring</h2>
-        <div className="time-controls">
+        {/* <div className="time-controls">
           <select 
             value={timeRange} 
             onChange={(e) => setTimeRange(e.target.value)}
@@ -227,7 +227,7 @@ const detectAlgaeInImage = async (lakeName) => {
               {currentDate.toLocaleDateString()}
             </span>
           )}
-        </div>
+        </div> */}
       </div>
 
       <div className="map-content">
@@ -294,7 +294,8 @@ const detectAlgaeInImage = async (lakeName) => {
               )}
             </div>
             
-            <div className="algae-detection-section">
+            {/* Removed since ML is not working currently, also due to time */}
+            {/* <div className="algae-detection-section">
               <h4>Latest Algae Detection</h4>
               {algaeImage ? (
                 <img 
@@ -311,7 +312,7 @@ const detectAlgaeInImage = async (lakeName) => {
                   {isLoading ? 'Processing...' : 'Run Algae Detection'}
                 </button>
               )}
-            </div>
+            </div> */}
             
             <div className="status-info">
               <h4>Status Information:</h4>

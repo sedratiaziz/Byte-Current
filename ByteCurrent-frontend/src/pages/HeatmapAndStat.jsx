@@ -172,18 +172,18 @@ const HeatmapAndStat = () => {
   };
 
   // Process image through algae detection API
-  const detectAlgaeInImage = async (imageUrl) => {
-    setIsLoading(true);
-    try {
-      setTimeout(() => {
-        setAlgaeImage('../');
-        setIsLoading(false);
-      }, 1500);
-    } catch (error) {
-      console.error('Error detecting algae:', error);
-      setIsLoading(false);
-    }
-  };
+  // const detectAlgaeInImage = async (imageUrl) => {
+  //   setIsLoading(true);
+  //   try {
+  //     setTimeout(() => {
+  //       setAlgaeImage('./sample-lake-img.jpg');
+  //       setIsLoading(false);
+  //     }, 1500);
+  //   } catch (error) {
+  //     console.error('Error detecting algae:', error);
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // Filter data based on selected time range
   const getFilteredData = () => {
@@ -218,7 +218,7 @@ const HeatmapAndStat = () => {
     <div className="algae-map-container">
       <div className="map-controls">
         <h2>Algae Bloom Monitoring (Heatmap)</h2>
-        <div className="time-controls">
+        {/* <div className="time-controls">
           <select 
             value={timeRange} 
             onChange={(e) => setTimeRange(e.target.value)}
@@ -242,7 +242,7 @@ const HeatmapAndStat = () => {
               {currentDate.toLocaleDateString()}
             </span>
           )}
-        </div>
+        </div> */}
       </div>
 
       <div className="map-content">
@@ -305,7 +305,8 @@ const HeatmapAndStat = () => {
               )}
             </div>
             
-            <div className="algae-detection-section">
+            {/* Removed since ML is not working currently, also due to time */}
+            {/* <div className="algae-detection-section">
               <h4>Latest Algae Detection</h4>
               {algaeImage ? (
                 <img 
@@ -322,7 +323,7 @@ const HeatmapAndStat = () => {
                   {isLoading ? 'Processing...' : 'Run Algae Detection'}
                 </button>
               )}
-            </div>
+            </div> */}
             
             <div className="status-info">
               <h4>Heatmap Legend:</h4>
