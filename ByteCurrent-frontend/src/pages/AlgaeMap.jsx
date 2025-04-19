@@ -97,24 +97,59 @@ const AlgaeMap = () => {
   };
 
   // Process image through algae detection API
-  const detectAlgaeInImage = async (imageUrl) => {
+  const detectAlgaeInImage = async (lakeName) => {
     setIsLoading(true);
     try {
-      // In a real implementation, you would:
-      // 1. Fetch the satellite image for the selected location
-      // 2. Send it to your Flask backend for processing
+      // In a real implementation, fetch satellite image for the location
+      // For demo, we'll use a sample image
+      const response = await fetch('sample-lake-image.jpg');
+      const imageBlob = await response.blob();
       
-      // Mock implementation
-      const mockAlgaeImage = `data:image/png;base64,...`; // This would be the real base64 from API
-      setAlgaeImage(mockAlgaeImage);
+      // Create FormData to send to backend
+      const formData = new FormData();
+      formData.append('image', imageBlob, `${lakeName}.jpg`);
       
-      // For demo purposes, we'll use a placeholder
-      setTimeout(() => {
-        setAlgaeImage('https://via.placeholder.com/500?text=Algae+Detection+Result');
-        setIsLoading(false);
-      }, 1500);
+      // Call your Flask backend
+      const apiResponse = await fetch('http://localhost:5000/api/detect-algae', {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - let the browser set it
+      });
+      
+      if (!apiResponse.ok) {
+        throw new Error('Algae detection failed');
+      }
+      
+      const result = await apiResponse.json();
+      
+      // Update state with results
+      setAlgaeImage(`data:image/png;base64,${result.algae_mask}`);
+      
+      // Update location data with new coverage info
+      setLocations(prev => ({
+        ...prev,
+        [lakeName]: {
+          ...prev[lakeName],
+          currentLevel: result.status,
+          coverage: result.coverage,
+        }
+      }));
+      
+      // Also update selected location if it's the current one
+      if (selectedLocation && selectedLocation.name === lakeName) {
+        setSelectedLocation(prev => ({
+          ...prev,
+          currentLevel: result.status,
+          coverage: result.coverage,
+        }));
+      }
+      
     } catch (error) {
       console.error('Error detecting algae:', error);
+      // Fallback to mock data if API fails
+      const mockAlgaeImage = `data:image/png;base64,...`; 
+      setAlgaeImage(mockAlgaeImage);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -148,6 +183,12 @@ const AlgaeMap = () => {
       },
     ],
   };
+
+
+
+
+
+  // Add this function to your component
 
   return (
     <div className="algae-map-container">
